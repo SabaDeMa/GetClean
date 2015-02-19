@@ -1,7 +1,7 @@
 # README file for data
 
 In this file you can find very brief informations about the script and the output.
-For more detailed informations about the data and the script you have to read the PDF named *CodeBook*.
+For more detailed informations about the data and the script you have to (**DOWNLOAD** by clicking on View Raw and) read the PDF named *CodeBook*.
 
 There is also a LaTeX version of the *CodeBook* if you are a Tex user.
 
