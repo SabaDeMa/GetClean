@@ -1,0 +1,120 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[a4paper]{geometry}
+\usepackage{microtype}
+\usepackage{lastpage}
+\usepackage{listings}
+\lstset{	basicstyle=\small\sffamily,
+		language=R,
+		numbers=left,
+		numberstyle=\tiny\bfseries\sffamily,
+		stepnumber=1,
+		tabsize=4,
+		}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancyhf{}
+\fancyfoot[C]{\bfseries\thepage\ of \pageref{LastPage}}
+\fancypagestyle{plain}
+{\fancyhf{}
+\fancyfoot[C]{\bfseries\thepage\ of \pageref{LastPage}}}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{bookmark}
+\begin{document}
+\title{Codebook}
+\author{\textsf{SabaDeMa}}
+\date{}
+\maketitle
+\section{Introduction}
+This file explains the code of the script for the assignment. It is organized by steps, labelled with \textsf{``Step''} and written in the script as comments. Before you start of course you have to unzip the folder with the data in the working directory in a a folder called \textsf{"UCI HAR DATASET"}.
+
+If not the case, and you prefer to unzip directly in the working directory, you have to delete from \textsf{read.table} commands the \textsf{"UCI HAR DATASET/"} in order to make the code work well.
+
+I preferred to keep variables of every step, this is just a personal choice but if users might want to delete objects or overwrite them I think that my code can be modified very easily.
+
+\section{Details of the steps}
+The first command load \textsf{dplyr} package and (I think) no explanations are needed.
+
+\begin{description}
+\item[\textsf{Step1:}] read all files in \textsf{\bfseries R} by using the read.table function.
+\item[\textsf{Step2:}] convert all objects to \textsf{tbl\_df} objects in order to use them in an easier way and allow functions like \textsf{group\_by} to work properly.
+\item[\textsf{Step3:}] select only the second column (the name, which is what we need) of  feature to use the result as names for the columns of \textsf{dataTrain} and \textsf{dataTest}, but before of that it must be converted into a vector and transposed with the \textsf{t()} function.
+Create names for the subjects and activities columns respectively \textsf{``Sub''} and \textsf{``Act''}.
+\item[\textsf{Step4:}] create a data frame for test and train with the data, the sub and the activities columns. Merge data frames together (\textsf{data\_train\_fin} and \textsf{data\_test\_fin}) to have a total data frame with all the sets names data\_total.
+\item[\textsf{Step5:}] select with the \textsf{grepl} function all columns that have the words mean and std inside their names.
+\item[\textsf{Step6:}] in order to have a more readable and shorter columns names this step does some abbreviations and replacements. It delete \textsf{tBody}, \textsf{fBody} and parenthesis (by escaping them with a double \textbackslash) from columns names and gives \textsf{``GY''} instead of \textsf{``Gyro''} and \textsf{``AC''} instead of \textsf{``Acc''}.
+\item[\textsf{Step7:}] this dataset has some issues due to some identical columns names, this can be verified with the following commands.
+These commands show that the problems are not due to modifications in the script  but they were there when the original dataset was created.
+\begin{lstlisting}
+> similarcol <- anyDuplicated(data_total, MARGIN = 2)
+> similarcol
+[1] 0
+\end{lstlisting}
+Columns have same names but with the previous commands we know that they are not the same things so I think that is better to keep them but in order to avoid problems, change name to the duplicates. That is done with this command:
+\begin{lstlisting}
+por <- make.names(nomi, unique = TRUE)
+\end{lstlisting}
+\item[\textsf{Step8:}] change levels from numbers 1 to 6 to activities names (\textsf{Walking}, \textsf{Walking\_Up}, etc.)
+\item[\textsf{Step9:}] group the dataset by using the \textsf{group\_by} function.
+\item[\textsf{Step10:}] create a dataset named \textsf{data\_4} with the mean for each variable grouped for each subject and activity.
+\item[\textsf{Step11:}] write \textsf{data\_4} dataset to an external file located in the woking directory named \textsf{data.txt}.
+\end{description}
+
+\section{Output file}
+The output file is \textsf{data\_4}. It has 14580 observations in total, 180 rows and 81 columns.
+Values of first column named \textsf{Act}, which describes the activities done by subjects are: \textsf{Walking}, \textsf{Walking\_Up},  \textsf{Walking\_down}, \textsf{Sitting}, \textsf{Standing}, \textsf{Lying}.
+
+Values of the second column named \textsf{Sub}, which represents the subjects are from 1 to 30, each number is a subjects.
+
+Names of all columns are:
+\begin{lstlisting}
+> names(data_4)
+ [1] "Act"                   "Sub"                  
+ [3] "ACmeanX"               "ACmeanY"              
+ [5] "ACmeanZ"               "ACstdX"               
+ [7] "ACstdY"                "ACstdZ"               
+ [9] "tGravityACmeanX"       "tGravityACmeanY"      
+[11] "tGravityACmeanZ"       "tGravityACstdX"       
+[13] "tGravityACstdY"        "tGravityACstdZ"       
+[15] "ACJerkmeanX"           "ACJerkmeanY"          
+[17] "ACJerkmeanZ"           "ACJerkstdX"           
+[19] "ACJerkstdY"            "ACJerkstdZ"           
+[21] "GYmeanX"               "GYmeanY"              
+[23] "GYmeanZ"               "GYstdX"               
+[25] "GYstdY"                "GYstdZ"               
+[27] "GYJerkmeanX"           "GYJerkmeanY"          
+[29] "GYJerkmeanZ"           "GYJerkstdX"           
+[31] "GYJerkstdY"            "GYJerkstdZ"           
+[33] "ACMagmean"             "ACMagstd"             
+[35] "tGravityACMagmean"     "tGravityACMagstd"     
+[37] "ACJerkMagmean"         "ACJerkMagstd"         
+[39] "GYMagmean"             "GYMagstd"             
+[41] "GYJerkMagmean"         "GYJerkMagstd"         
+[43] "ACmeanX.1"             "ACmeanY.1"            
+[45] "ACmeanZ.1"             "ACstdX.1"             
+[47] "ACstdY.1"              "ACstdZ.1"             
+[49] "ACmeanFreqX"           "ACmeanFreqY"          
+[51] "ACmeanFreqZ"           "ACJerkmeanX.1"        
+[53] "ACJerkmeanY.1"         "ACJerkmeanZ.1"        
+[55] "ACJerkstdX.1"          "ACJerkstdY.1"         
+[57] "ACJerkstdZ.1"          "ACJerkmeanFreqX"      
+[59] "ACJerkmeanFreqY"       "ACJerkmeanFreqZ"      
+[61] "GYmeanX.1"             "GYmeanY.1"            
+[63] "GYmeanZ.1"             "GYstdX.1"             
+[65] "GYstdY.1"              "GYstdZ.1"             
+[67] "GYmeanFreqX"           "GYmeanFreqY"          
+[69] "GYmeanFreqZ"           "ACMagmean.1"          
+[71] "ACMagstd.1"            "ACMagmeanFreq"        
+[73] "BodyACJerkMagmean"     "BodyACJerkMagstd"     
+[75] "BodyACJerkMagmeanFreq" "BodyGYMagmean"        
+[77] "BodyGYMagstd"          "BodyGYMagmeanFreq"    
+[79] "BodyGYJerkMagmean"     "BodyGYJerkMagstd"     
+[81] "BodyGYJerkMagmeanFreq"
+\end{lstlisting}
+\end{document}
